@@ -28,10 +28,25 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/resume-analyzer')
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+// MongoDB connection with better error handling and fallback mode
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      retryWrites: true,
+      w: 'majority'
+    });
+    console.log('✅ MongoDB connected');
+  } catch (error) {
+    console.warn('⚠️  MongoDB connection failed, running in fallback mode');
+    console.warn('❌ Error:', error.message);
+    console.warn('📝 Note: Analysis data will not be persisted');
+  }
+};
+
+connectDB();
 
 const PORT = process.env.PORT || 5000;
 

@@ -11,28 +11,36 @@ const sendMessage = async (req, res) => {
 
     const aiResponse = await geminiClient.chatAboutResume(message, resumeText);
 
-    let chat = await Chat.findOne({ sessionId });
-    
-    if (!chat) {
-      chat = await Chat.create({
-        sessionId: sessionId || `session_${Date.now()}`,
-        resumeId: resumeId || null,
-        context: resumeText,
-        messages: []
+    // Try to save to database (with fallback if connection fails)
+    let chat;
+    try {
+      chat = await Chat.findOne({ sessionId });
+      
+      if (!chat) {
+        chat = await Chat.create({
+          sessionId: sessionId || `session_${Date.now()}`,
+          resumeId: resumeId || null,
+          context: resumeText,
+          messages: []
+        });
+      }
+
+      chat.messages.push({
+        role: 'user',
+        content: message
       });
+
+      chat.messages.push({
+        role: 'assistant',
+        content: aiResponse
+      });
+
+      await chat.save();
+    } catch (dbError) {
+      console.warn('⚠️  Database save failed for chat, continuing without persistence');
+      // Create a temporary session ID if not provided
+      chat = { sessionId: sessionId || `session_${Date.now()}` };
     }
-
-    chat.messages.push({
-      role: 'user',
-      content: message
-    });
-
-    chat.messages.push({
-      role: 'assistant',
-      content: aiResponse
-    });
-
-    await chat.save();
 
     res.json({
       success: true,

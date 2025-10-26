@@ -62,31 +62,34 @@ const uploadResume = async (req, res) => {
         return res.status(400).json({ error: 'Could not extract text from resume' });
       }
 
-      // Save resume to database
-      const resume = await Resume.create({
-        fileName: fileName,
-        fileSize: req.file.size,
-        status: 'analyzing'
-      });
-
       // Analyze resume with Gemini AI
       const analysis = await geminiClient.analyzeResume(resumeText);
 
-      // Save analysis to database
-      await Analysis.create({
-        resumeId: resume._id,
-        summary: analysis.summary,
-        skills: analysis.skills || [],
-        atsScore: analysis.atsScore,
-        missingKeywords: analysis.missingKeywords || [],
-        suggestions: analysis.suggestions || [],
-        strengths: analysis.strengths || [],
-        weaknesses: analysis.weaknesses || [],
-        rawResponse: analysis
-      });
+      // Try to save to database (with fallback if connection fails)
+      try {
+        const resume = await Resume.create({
+          fileName: fileName,
+          fileSize: req.file.size,
+          status: 'analyzing'
+        });
 
-      resume.status = 'completed';
-      await resume.save();
+        await Analysis.create({
+          resumeId: resume._id,
+          summary: analysis.summary,
+          skills: analysis.skills || [],
+          atsScore: analysis.atsScore,
+          missingKeywords: analysis.missingKeywords || [],
+          suggestions: analysis.suggestions || [],
+          strengths: analysis.strengths || [],
+          weaknesses: analysis.weaknesses || [],
+          rawResponse: analysis
+        });
+
+        resume.status = 'completed';
+        await resume.save();
+      } catch (dbError) {
+        console.warn('⚠️  Database save failed, continuing without persistence');
+      }
 
       fs.unlinkSync(filePath);
 
@@ -94,7 +97,7 @@ const uploadResume = async (req, res) => {
         success: true,
         data: analysis,
         fileName: fileName,
-        resumeId: resume._id,
+        resumeId: null, // Will be null in fallback mode
         resumeText: resumeText, // Add the raw resume text for chat
         message: 'Resume analyzed successfully'
       });
