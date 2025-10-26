@@ -1,0 +1,26 @@
+{
+  "name": "resume-analyzer-ai",
+  "version": "1.0.0",
+  "description": "AI Resume Analyzer with Chatbot - MERN Stack Application",
+  "scripts": {
+    "install-all": "cd server && npm install && cd ../client && npm install",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm start",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start"
+  },
+  "keywords": [
+    "resume",
+    "analyzer",
+    "ai",
+    "chatbot",
+    "mern"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
