@@ -31,5 +31,29 @@ export const sendChatMessage = async (message, resumeText) => {
   return response.data;
 };
 
+export const downloadAnalysisReport = async (analysisData) => {
+  try {
+    const response = await api.post('/export/analysis', analysisData, {
+      responseType: 'blob',
+    });
+    
+    // Create a blob and download it
+    const blob = new Blob([response.data], { type: 'text/html' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `resume_analysis_report_${Date.now()}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    return true;
+  } catch (error) {
+    console.error('Download failed:', error);
+    throw error;
+  }
+};
+
 export default api;
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { uploadResume } from '../api';
+import { uploadResume, downloadAnalysisReport } from '../api';
 
 const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
   const navigate = useNavigate();
@@ -9,6 +9,21 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadReport = async () => {
+    if (!analysis) return;
+    
+    setDownloading(true);
+    try {
+      await downloadAnalysisReport(analysis);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('Failed to download report. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleFileInput = (e) => {
     if (e.target.files[0]) handleFile(e.target.files[0]);
@@ -491,9 +506,13 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
                     <span className="material-symbols-outlined text-sm">refresh</span>
                     Analyze New Resume
                   </button>
-                  <button className="w-full px-4 py-3 rounded-lg border border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2">
+                  <button 
+                    onClick={handleDownloadReport}
+                    disabled={downloading}
+                    className="w-full px-4 py-3 rounded-lg border border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
                     <span className="material-symbols-outlined text-sm">download</span>
-                    Download Report
+                    {downloading ? 'Downloading...' : 'Download Report'}
                   </button>
                 </div>
               </div>
