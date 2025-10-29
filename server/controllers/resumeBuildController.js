@@ -60,8 +60,8 @@ const saveResume = async (req, res) => {
     let resume;
     if (resumeId) {
       // Update existing resume
-      resume = await ResumeBuild.findByIdAndUpdate(
-        resumeId,
+      resume = await ResumeBuild.findOneAndUpdate(
+        { _id: resumeId, userId: req.user?.id || null },
         {
           templateId,
           resumeData,
@@ -78,6 +78,7 @@ const saveResume = async (req, res) => {
       resume = await ResumeBuild.create({
         templateId,
         resumeData,
+        userId: req.user?.id || null,
       });
     }
 
@@ -100,8 +101,10 @@ const saveResume = async (req, res) => {
 const getResume = async (req, res) => {
   try {
     const { resumeId } = req.params;
+    const query = { _id: resumeId };
+    if (req.user?.id) query.userId = req.user.id;
 
-    const resume = await ResumeBuild.findById(resumeId);
+    const resume = await ResumeBuild.findOne(query);
 
     if (!resume) {
       return res.status(404).json({ error: 'Resume not found' });
@@ -117,5 +120,17 @@ const getResume = async (req, res) => {
   }
 };
 
-module.exports = { getAISuggestion, saveResume, getResume };
+const listMyResumes = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const items = await ResumeBuild.find({ userId }).sort({ updatedAt: -1 }).select('_id templateId updatedAt savedAt');
+    res.json({ success: true, items });
+  } catch (error) {
+    console.error('Error listing resumes:', error);
+    res.status(500).json({ error: 'Failed to list resumes: ' + error.message });
+  }
+};
+
+module.exports = { getAISuggestion, saveResume, getResume, listMyResumes };
 

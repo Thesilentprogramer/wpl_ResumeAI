@@ -3,6 +3,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { saveResume } from '../api';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import ReactDOMServer from 'react-dom/server';
+import { templateComponents } from './templates';
 
 const ResumeEditor = ({ template, onBack, resumeId: initialResumeId }) => {
   const { theme } = useTheme();
@@ -98,7 +100,63 @@ const ResumeEditor = ({ template, onBack, resumeId: initialResumeId }) => {
     }
   };
 
+  const toExternalTemplateData = () => {
+    const p = resumeData.personalInfo || {};
+    return {
+      personal: {
+        fullName: p.fullName,
+        headline: '',
+        email: p.email,
+        phone: p.phone,
+        location: p.location,
+        website: p.portfolio,
+        linkedin: p.linkedin,
+        github: p.github,
+        summary: resumeData.professionalSummary,
+      },
+      experience: (resumeData.experience || []).map(e => ({
+        role: e.position,
+        company: e.company,
+        startDate: e.startDate,
+        endDate: e.endDate,
+        location: e.location,
+        highlights: (e.achievements || []).length ? e.achievements : (e.description ? [e.description] : []),
+      })),
+      education: (resumeData.education || []).map(ed => ({
+        degree: ed.degree,
+        field: ed.field,
+        institution: ed.institution,
+        startDate: ed.startDate,
+        endDate: ed.endDate,
+        location: ed.location,
+        details: ed.gpa ? `GPA: ${ed.gpa}` : '',
+      })),
+      skills: resumeData.skills || [],
+      projects: (resumeData.projects || []).map(pr => ({ heading: pr.name, content: pr.description })),
+    };
+  };
+
+  const companyToExternalTemplate = {
+    apple: 'modern',
+    netflix: 'two-column',
+    google: 'classic',
+    microsoft: 'minimalist',
+    meta: 'sidebar-blue',
+    amazon: 'compact',
+  };
+
+  const renderExternalIfAvailable = () => {
+    const key = companyToExternalTemplate[template.id];
+    if (!key) return null;
+    const Comp = templateComponents[key];
+    if (!Comp) return null;
+    const markup = ReactDOMServer.renderToStaticMarkup(React.createElement(Comp, { data: toExternalTemplateData() }));
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${markup}</body></html>`;
+  };
+
   const generateResumeHTML = () => {
+    const external = renderExternalIfAvailable();
+    if (external) return external;
     const toStringSafe = (value) => {
       if (value == null) return '';
       if (Array.isArray(value)) return value.map((v) => toStringSafe(v)).filter(Boolean).join(', ');
@@ -951,6 +1009,12 @@ const ResumeEditor = ({ template, onBack, resumeId: initialResumeId }) => {
   };
 
   const generateResumePreviewContent = () => {
+    const external = renderExternalIfAvailable();
+    if (external) {
+      // strip html/body wrapper for preview container
+      const inner = external.replace(/^.*<body>/s, '').replace(/<\/body>.*$/s, '');
+      return inner;
+    }
     // Just get the resume-container content for preview
     const toStringSafe = (value) => {
       if (value == null) return '';

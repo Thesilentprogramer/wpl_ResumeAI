@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadResume } from '../api';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Home = ({ onOpenChat, onAnalysisComplete }) => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +50,10 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     if (!file) {
       setError('Please select a file');
       return;
@@ -116,6 +122,16 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
           >
             Home
           </button>
+          {user ? (
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-2 rounded-full bg-green-500 text-white font-medium"
+            >
+              Dashboard
+            </button>
+          ) : (
+            <button onClick={() => navigate('/login')} className="px-6 py-2 rounded-full bg-blue-600 text-white font-medium">Login / Signup</button>
+          )}
           <button
             onClick={toggleTheme}
             className={`p-2 rounded-lg transition-colors duration-300 ${
@@ -131,24 +147,7 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
               <span className="material-symbols-outlined text-gray-700">dark_mode</span>
             )}
           </button>
-          <button
-            onClick={() => navigate('/builder')}
-            className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-              theme === 'dark'
-                ? 'border border-white/10 text-white hover:bg-white/5'
-                : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">edit</span>
-            Build Resume
-          </button>
-          <button
-            onClick={() => navigate('/analysis')}
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined text-sm">description</span>
-            Analyze Resume
-          </button>
+          {/* Navbar simplified: only Dashboard or Login/Signup, no extra Build/Analyze buttons here */}
         </div>
       </header>
 
@@ -188,14 +187,14 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
             
             <div className="flex flex-wrap gap-4 justify-center mb-12">
               <button
-                onClick={() => navigate('/builder')}
+                onClick={() => user ? navigate('/builder') : navigate('/login')}
                 className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_10px_30px_-10px] shadow-blue-600/50 flex items-center gap-2 ring-1 ring-inset ring-white/10"
               >
                 <span>Build Resume</span>
                 <span className="material-symbols-outlined">edit</span>
               </button>
               <button
-                onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => user ? document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' }) : navigate('/login')}
                 className={`px-8 py-4 rounded-xl border font-bold backdrop-blur-sm transition-colors duration-300 ${
                   theme === 'dark'
                     ? 'border-white/10 text-white hover:border-white/20 hover:bg-white/5'

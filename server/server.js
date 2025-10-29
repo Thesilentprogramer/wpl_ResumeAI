@@ -18,10 +18,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const resumeRoutes = require('./routes/resumeRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const exportRoutes = require('./routes/exportRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/resume', resumeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

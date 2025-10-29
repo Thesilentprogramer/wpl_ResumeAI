@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Home from './pages/Home';
 import Analysis from './pages/Analysis';
 import ResumeBuilder from './pages/ResumeBuilder';
 import ChatModal from './components/ChatModal';
+import PrivateRoute from './components/PrivateRoute';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -12,6 +17,7 @@ function App() {
 
   return (
     <ThemeProvider>
+      <AuthProvider>
       <Router>
         <div className="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark min-h-screen">
           <Routes>
@@ -19,18 +25,23 @@ function App() {
               path="/" 
               element={<Home onOpenChat={() => setChatOpen(true)} onAnalysisComplete={setAnalysisData} />} 
             />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route 
               path="/analysis" 
               element={
-                <Analysis 
-                  data={analysisData}
-                  onOpenChat={() => setChatOpen(true)}
-                />
+                <PrivateRoute>
+                  <Analysis 
+                    data={analysisData}
+                    onOpenChat={() => setChatOpen(true)}
+                  />
+                </PrivateRoute>
               } 
             />
             <Route 
               path="/builder" 
-              element={<ResumeBuilder />} 
+              element={<PrivateRoute><ResumeBuilder /></PrivateRoute>} 
             />
           </Routes>
 
@@ -41,6 +52,7 @@ function App() {
           />
         </div>
       </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

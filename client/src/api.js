@@ -9,6 +9,30 @@ const api = axios.create({
   },
 });
 
+// Attach Authorization header if token is present
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const signup = async (payload) => {
+  const res = await api.post('/auth/signup', payload);
+  return res.data;
+};
+
+export const login = async (payload) => {
+  const res = await api.post('/auth/login', payload);
+  return res.data;
+};
+
+export const fetchMe = async () => {
+  const res = await api.get('/auth/me');
+  return res.data;
+};
+
 export const uploadResume = async (file) => {
   const formData = new FormData();
   formData.append('resume', file);
@@ -63,6 +87,11 @@ export const saveResume = async (resumeData) => {
     console.error('Failed to save resume:', error);
     throw error;
   }
+};
+
+export const listMyResumes = async () => {
+  const res = await api.get('/resume/list/my');
+  return res.data;
 };
 
 export default api;
