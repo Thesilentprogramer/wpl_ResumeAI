@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadResume } from '../api';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Home = ({ onOpenChat, onAnalysisComplete }) => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -68,30 +70,81 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950">
+    <div className={`min-h-screen transition-colors duration-300 relative overflow-hidden ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-[#0a0f2d] via-[#0a1338] to-[#0b1a4a]' 
+        : 'bg-gradient-to-b from-white via-gray-50 to-gray-100'
+    }`}>
+      {/* Grid overlay + spotlight for AuthKit vibe */}
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? '[background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] opacity-[0.08]'
+          : '[background-image:linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] opacity-50'
+      } bg-[length:40px_40px]`}></div>
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(56,189,248,0.15),transparent_60%)]'
+          : 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(59,130,246,0.08),transparent_60%)]'
+      }`}></div>
+      {/* Decorative gradient glows */}
+      {theme === 'dark' && (
+        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[32rem] w-[32rem] rounded-full bg-gradient-to-b from-cyan-400/20 via-blue-500/10 to-transparent blur-3xl"></div>
+      )}
       {/* Header */}
-      <header className="w-full px-6 sm:px-12 py-4 flex items-center justify-between">
+      <header className={`w-full px-6 sm:px-12 py-4 flex items-center justify-between bg-transparent border-b transition-colors duration-300 ${
+        theme === 'dark' ? 'border-white/10' : 'border-gray-200'
+      }`}>
         <button 
           onClick={() => navigate('/analysis')}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-xl">⚡</span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+            <span className="text-white text-xl font-bold">R</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            ResumeAI Analyzer
+          <h1 className={`text-xl sm:text-2xl font-bold transition-colors duration-300 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
+            ResumeAI
           </h1>
         </button>
         <div className="flex items-center gap-6">
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="text-gray-300 hover:text-white transition-colors"
+            className={`transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+            }`}
           >
             Home
           </button>
           <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg transition-colors duration-300 ${
+              theme === 'dark' 
+                ? 'bg-gray-800 hover:bg-gray-700' 
+                : 'bg-gray-200 hover:bg-gray-300'
+            }`}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <span className="material-symbols-outlined text-yellow-400">light_mode</span>
+            ) : (
+              <span className="material-symbols-outlined text-gray-700">dark_mode</span>
+            )}
+          </button>
+          <button
+            onClick={() => navigate('/builder')}
+            className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+              theme === 'dark'
+                ? 'border border-white/10 text-white hover:bg-white/5'
+                : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">edit</span>
+            Build Resume
+          </button>
+          <button
             onClick={() => navigate('/analysis')}
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
+            className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-sm">description</span>
             Analyze Resume
@@ -100,116 +153,182 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
       </header>
 
       {/* Hero Section */}
-      <section className="px-6 sm:px-12 py-16 sm:py-24">
+      <section className="px-6 sm:px-12 py-20 bg-transparent">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            {/* Left Content */}
-            <div className="flex-1 space-y-8">
-              <div className="inline-block">
-                <span className="px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-300 text-sm font-medium">
-                  AI-Powered Resume Analysis
-                </span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
-                Transform Your Resume,<br />Transform Your Career.
-              </h1>
-              
-              <p className="text-lg text-gray-300 max-w-xl">
-                Get professional, AI-driven insights to create a resume that stands out. Beat the ATS, impress recruiters, and land more interviews with our advanced resume analyzer.
-              </p>
-              
-              <div className="flex flex-wrap gap-4">
-                <button
-                  onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
-                  disabled={uploading}
-                >
-                  <span>Analyze My Resume Free</span>
-                  <span className="material-symbols-outlined">arrow_forward</span>
-                </button>
-                <button className="px-8 py-4 rounded-lg border-2 border-purple-500/30 text-white font-bold hover:border-purple-500/50 transition-colors">
-                  See How It Works
-                </button>
-              </div>
-
-              {/* Feature Badges */}
-              <div className="flex flex-wrap gap-6 pt-4">
-                <div className="flex items-center gap-2 text-green-400">
-                  <span className="material-symbols-outlined text-lg">check_circle</span>
-                  <span className="text-sm font-medium">No credit card required</span>
-                </div>
-                <div className="flex items-center gap-2 text-green-400">
-                  <span className="material-symbols-outlined text-lg">check_circle</span>
-                  <span className="text-sm font-medium">Instant results</span>
-                </div>
-              </div>
+          <div className="text-center mb-16">
+            <div className="inline-block mb-6">
+              <span className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 ${
+                theme === 'dark'
+                  ? 'bg-blue-500/20 border border-blue-500/30 text-blue-400'
+                  : 'bg-blue-100 border border-blue-200 text-blue-700'
+              }`}>
+                AI-Powered Resume Builder
+              </span>
+            </div>
+            <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight transition-colors duration-300 ${
+              theme === 'dark'
+                ? 'text-white drop-shadow-[0_0_30px_rgba(56,189,248,0.25)]'
+                : 'text-gray-900'
+            }`}>
+              Create a Resume That
+              <br />
+              <span className={`text-transparent bg-clip-text bg-gradient-to-r transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'from-cyan-300 via-blue-400 to-indigo-500 drop-shadow-[0_0_30px_rgba(56,189,248,0.35)]'
+                  : 'from-blue-600 via-blue-700 to-indigo-800'
+              }`}>
+                Gets You Hired
+              </span>
+            </h1>
+            <p className={`text-xl max-w-2xl mx-auto mb-8 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Build a professional resume in minutes with our AI-powered builder. Get past ATS systems and land more interviews.
+            </p>
+            
+            <div className="flex flex-wrap gap-4 justify-center mb-12">
+              <button
+                onClick={() => navigate('/builder')}
+                className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_10px_30px_-10px] shadow-blue-600/50 flex items-center gap-2 ring-1 ring-inset ring-white/10"
+              >
+                <span>Build Resume</span>
+                <span className="material-symbols-outlined">edit</span>
+              </button>
+              <button
+                onClick={() => document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className={`px-8 py-4 rounded-xl border font-bold backdrop-blur-sm transition-colors duration-300 ${
+                  theme === 'dark'
+                    ? 'border-white/10 text-white hover:border-white/20 hover:bg-white/5'
+                    : 'border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                }`}
+              >
+                Analyze Resume
+              </button>
             </div>
 
-            {/* Right Image */}
-            <div className="flex-1">
-              <div className="relative w-full h-[500px] rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl shadow-purple-500/20">
-                <img
-                  src="https://images.unsplash.com/photo-1425421669292-0c3da3b8f529?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBidXNpbmVzcyUyMHBlcnNvbnxlbnwxfHx8fDE3NjE0MzkyNzZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                  alt="Professional Career Success"
-                  className="w-full h-full object-cover"
-                />
+            {/* Feature Badges */}
+            <div className="flex flex-wrap gap-6 justify-center">
+              <div className={`flex items-center gap-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <span className="material-symbols-outlined text-lg text-green-400">check_circle</span>
+                <span className="text-sm font-medium">No credit card required</span>
+              </div>
+              <div className={`flex items-center gap-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <span className="material-symbols-outlined text-lg text-green-400">check_circle</span>
+                <span className="text-sm font-medium">Free templates</span>
+              </div>
+              <div className={`flex items-center gap-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <span className="material-symbols-outlined text-lg text-green-400">check_circle</span>
+                <span className="text-sm font-medium">Instant download</span>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Stats Section */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mt-20 pt-12 border-t border-gray-800">
+      {/* Stats Section */}
+      <section className="px-6 sm:px-12 py-12 bg-transparent">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl font-black text-white mb-2">50K+</div>
-              <div className="text-gray-400 text-sm">Resumes Analyzed</div>
+              <div className={`text-4xl font-black mb-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>500K+</div>
+              <div className={`text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Resumes Created</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-white mb-2">95%</div>
-              <div className="text-gray-400 text-sm">Success Rate</div>
+              <div className={`text-4xl font-black mb-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>95%</div>
+              <div className={`text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>ATS Success Rate</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-white mb-2">4.9/5</div>
-              <div className="text-gray-400 text-sm">User Rating</div>
+              <div className={`text-4xl font-black mb-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>4.9/5</div>
+              <div className={`text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>User Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-black text-white mb-2">2x</div>
-              <div className="text-gray-400 text-sm">More Interviews</div>
+              <div className={`text-4xl font-black mb-2 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>24/7</div>
+              <div className={`text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Available</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="px-6 sm:px-12 py-20" id="features">
+      <section className="px-6 sm:px-12 py-20 bg-transparent" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
-              Powerful Features to Boost Your Career
+            <h2 className={`text-4xl sm:text-5xl font-black mb-4 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              Why Choose <span className="text-blue-500">ResumeAI</span>?
             </h2>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Our AI-powered analyzer provides comprehensive insights to help you create a resume that gets results.
+            <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Everything you need to create a winning resume that stands out to recruiters
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: '🎯', title: 'ATS Optimization', desc: 'Ensure your resume passes Applicant Tracking Systems with our advanced keyword analysis and formatting checks.' },
-              { icon: '📈', title: 'Skill Matching', desc: 'Match your skills with industry standards and get personalized recommendations for improvement.' },
-              { icon: '📑', title: 'Format Analysis', desc: 'Get expert feedback on your resume structure, layout, and visual presentation.' },
-              { icon: '⚡', title: 'Instant Feedback', desc: 'Receive detailed insights and actionable suggestions in seconds.' },
-              { icon: '🛡️', title: 'Content Review', desc: 'Analyze your work experience, achievements, and bullet points for maximum impact.' },
-              { icon: '⭐', title: 'AI-Powered Insights', desc: 'Leverage cutting-edge AI technology to optimize your resume for your target role.' },
+              {  
+                title: 'ATS-Optimized', 
+                desc: 'Every resume is optimized to pass Applicant Tracking Systems. Our AI analyzes keywords and formatting to maximize your chances.' 
+              },
+              { 
+                title: 'Professional Templates', 
+                desc: 'Choose from dozens of professionally designed templates. All templates are ATS-friendly and recruiter-approved.' 
+              },
+              { 
+                title: 'Quick & Easy', 
+                desc: 'Create a complete resume in minutes. Our intuitive builder makes it simple for anyone to create a professional resume.' 
+              },
+              { 
+                title: '100% Secure', 
+                desc: 'Your data is encrypted and secure. We never share your information with third parties. Build with confidence.' 
+              },
+              { 
+                title: 'Real-Time Feedback', 
+                desc: 'Get instant suggestions as you type. Our AI helps you improve your resume content in real-time.' 
+              },
+              { 
+                title: 'Industry-Tested', 
+                desc: 'Used by professionals across all industries. Our templates and formats are proven to get results.' 
+              },
             ].map((feature, idx) => (
               <div
                 key={idx}
-                className="group p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300"
+                className={`p-8 rounded-xl transition-all duration-300 backdrop-blur-sm ${
+                  theme === 'dark'
+                    ? 'bg-white/5 border border-white/10 hover:border-blue-500/40 hover:bg-white/10'
+                    : 'bg-white border border-gray-200 hover:border-blue-400 hover:shadow-lg shadow-gray-200'
+                }`}
               >
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20 mb-4 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
+
+                <h3 className={`text-2xl font-bold mb-4 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>{feature.title}</h3>
+                <p className={`leading-relaxed transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -217,56 +336,56 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
       </section>
 
       {/* How It Works Section */}
-      <section className="px-6 sm:px-12 py-20">
+      <section className="px-6 sm:px-12 py-20 bg-transparent">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl sm:text-5xl font-black mb-4 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              How It Works
+            </h2>
+            <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Get started in three simple steps
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { num: '01', title: 'Upload Your Resume', desc: 'Simply upload your existing resume or paste the content directly.' },
-              { num: '02', title: 'AI Analysis', desc: 'Our advanced AI scans and evaluates every aspect of your resume.' },
-              { num: '03', title: 'Get Insights', desc: 'Receive a comprehensive report with actionable recommendations.' },
-              { num: '04', title: 'Improve & Succeed', desc: 'Apply the suggestions and land your dream job faster.' },
+              { 
+                num: '01', 
+                title: 'Upload or Build', 
+                desc: 'Upload your existing resume or start from scratch with our AI-powered builder. Add your experience, skills, and education.' 
+              },
+              { 
+                num: '02', 
+                title: 'AI Analysis & Optimization', 
+                desc: 'Our AI analyzes your resume and provides real-time feedback. Get suggestions for keywords, formatting, and content improvements.' 
+              },
+              { 
+                num: '03', 
+                title: 'Download & Apply', 
+                desc: 'Export your resume as PDF or Word document. Download and start applying to jobs with confidence.' 
+              },
             ].map((step, idx) => (
               <div
                 key={idx}
-                className="p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                className={`p-8 rounded-xl transition-all backdrop-blur-sm ${
+                  theme === 'dark'
+                    ? 'bg-white/5 border border-white/10 hover:border-blue-500/40 hover:bg-white/10'
+                    : 'bg-white border border-gray-200 hover:border-blue-400 hover:shadow-lg shadow-gray-200'
+                }`}
               >
-                <div className="text-6xl font-black text-purple-500/30 mb-4">{step.num}</div>
-                <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
-                <p className="text-gray-400 text-sm">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="px-6 sm:px-12 py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">
-              Loved by Job Seekers Worldwide
-            </h2>
-            <p className="text-lg text-gray-400">
-              Join thousands of professionals who have transformed their careers
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { rating: 5, text: 'This tool helped me optimize my resume and I landed 3 interviews in just one week!' },
-              { rating: 5, text: 'The ATS optimization feature is a game-changer. My resume now gets past the initial screening.' },
-              { rating: 5, text: 'Incredible insights! The AI caught things I never would have noticed on my own.' },
-            ].map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <span key={i} className="text-yellow-400">★</span>
-                  ))}
-                </div>
-                <p className="text-gray-300">{testimonial.text}</p>
+                <div className={`text-7xl font-black mb-6 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-blue-500/20' : 'text-blue-200'
+                }`}>{step.num}</div>
+                <h3 className={`text-2xl font-bold mb-4 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>{step.title}</h3>
+                <p className={`leading-relaxed transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -274,43 +393,69 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
       </section>
 
       {/* Upload Section */}
-      <section id="upload-section" className="px-6 sm:px-12 py-20">
-        <div className="max-w-3xl mx-auto">
-          <div className="p-8 sm:p-12 rounded-2xl bg-gradient-to-br from-purple-900/20 to-slate-900/50 border border-purple-500/30 text-center space-y-6">
-            <h2 className="text-3xl sm:text-4xl font-black text-white">
-              Ready to Land Your Dream Job?
+      <section id="upload-section" className="px-6 sm:px-12 py-20 bg-transparent">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className={`text-4xl sm:text-5xl font-black mb-4 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              Ready to Build Your Resume?
             </h2>
-            <p className="text-lg text-gray-300">
-              Start analyzing your resume now and get professional insights in seconds. No credit card required.
+            <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Upload your existing resume for AI analysis or start fresh with our builder
             </p>
+          </div>
 
-            <form onSubmit={handleSubmit} className="mt-8">
+          <div className={`p-8 sm:p-12 rounded-2xl backdrop-blur-md transition-all duration-300 ${
+            theme === 'dark'
+              ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+              : 'bg-white border border-gray-200 shadow-xl'
+          }`}>
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div
-                className={`border-2 border-dashed rounded-xl p-12 transition-all ${isDragging ? 'border-purple-500 bg-purple-500/10' : 'border-gray-700'} ${error ? 'border-red-500' : ''}`}
+                className={`border-2 border-dashed rounded-xl p-12 transition-all ${
+                  isDragging 
+                    ? 'border-blue-500 bg-blue-500/10' 
+                    : theme === 'dark' 
+                      ? 'border-white/10' 
+                      : 'border-gray-300'
+                } ${error ? 'border-red-500' : ''}`}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
               >
                 {file ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-center">
                     <span className="material-symbols-outlined text-green-400 text-6xl">check_circle</span>
-                    <p className="text-white font-bold text-lg">{file.name}</p>
-                    <p className="text-gray-400 text-sm">{(file.size / 1024).toFixed(2)} KB</p>
+                    <p className={`font-bold text-lg transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{file.name}</p>
+                    <p className={`text-sm transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{(file.size / 1024).toFixed(2)} KB</p>
                     <button
                       type="button"
                       onClick={() => setFile(null)}
-                      className="text-purple-400 hover:text-purple-300 text-sm"
+                      className="text-blue-400 hover:text-blue-300 text-sm font-medium"
                     >
                       Choose different file
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <span className="material-symbols-outlined text-gray-400 text-6xl">cloud_upload</span>
-                    <p className="text-white font-bold text-lg">
+                  <div className="space-y-4 text-center">
+                    <span className={`material-symbols-outlined text-6xl transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                    }`}>cloud_upload</span>
+                    <p className={`font-bold text-lg transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>
                       Drag & Drop Your Resume Here
                     </p>
-                    <p className="text-gray-400 text-sm">or browse your files</p>
+                    <p className={`text-sm transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>or browse your files</p>
                     <input
                       type="file"
                       className="hidden"
@@ -320,7 +465,7 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
                     />
                     <label
                       htmlFor="file-upload"
-                      className="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all cursor-pointer"
+                      className="inline-block px-8 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all cursor-pointer ring-1 ring-inset ring-white/10"
                     >
                       Browse Files
                     </label>
@@ -330,7 +475,11 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
               </div>
 
               {error && (
-                <div className="mt-4 p-3 bg-red-500/10 border border-red-500 rounded text-red-400 text-sm">
+                <div className={`p-4 border rounded-lg text-sm transition-colors duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                    : 'bg-red-50 border-red-200 text-red-600'
+                }`}>
                   {error}
                 </div>
               )}
@@ -339,9 +488,16 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="mt-6 w-full px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 disabled:opacity-50"
+                  className="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_10px_30px_-10px] shadow-blue-600/50 disabled:opacity-50 disabled:cursor-not-allowed ring-1 ring-inset ring-white/10"
                 >
-                  {uploading ? 'Analyzing...' : 'Get Your Free Analysis'}
+                  {uploading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin">⏳</span>
+                      Analyzing Resume...
+                    </span>
+                  ) : (
+                    'Analyze My Resume'
+                  )}
                 </button>
               )}
             </form>
@@ -350,46 +506,69 @@ const Home = ({ onOpenChat, onAnalysisComplete }) => {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 sm:px-12 py-12 border-t border-gray-800">
+      <footer className={`px-6 sm:px-12 py-12 border-t bg-transparent transition-colors duration-300 ${
+        theme === 'dark' ? 'border-white/10' : 'border-gray-200'
+      }`}>
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-xl">⚡</span>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                  <span className="text-white text-xl font-bold">R</span>
                 </div>
-                <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-                  ResumeAI Analyzer
+                <h3 className="text-xl font-bold text-white">
+                  ResumeAI
                 </h3>
               </div>
-              <p className="text-gray-400 text-sm">
-                AI-powered resume analysis for better career outcomes.
+              <p className={`text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                Build professional resumes that get you hired. AI-powered, ATS-optimized, and recruiter-approved.
               </p>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">How it works</a></li>
+              <h4 className={`font-bold mb-4 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Product</h4>
+              <ul className={`space-y-2 text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Templates</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Pricing</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Resources</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Resume Tips</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Career Advice</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+              <h4 className={`font-bold mb-4 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Resources</h4>
+              <ul className={`space-y-2 text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Resume Tips</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Career Advice</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Blog</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+              <h4 className={`font-bold mb-4 transition-colors duration-300 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>Company</h4>
+              <ul className={`space-y-2 text-sm transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Terms</a></li>
               </ul>
             </div>
+          </div>
+          <div className={`pt-8 border-t text-center text-sm transition-colors duration-300 ${
+            theme === 'dark'
+              ? 'border-gray-700 text-gray-400'
+              : 'border-gray-200 text-gray-600'
+          }`}>
+            © 2024 ResumeAI. All rights reserved.
           </div>
         </div>
       </footer>

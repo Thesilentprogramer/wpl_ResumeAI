@@ -55,5 +55,15 @@ export const downloadAnalysisReport = async (analysisData) => {
   }
 };
 
+export const saveResume = async (resumeData) => {
+  try {
+    const response = await api.post('/resume/save', resumeData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to save resume:', error);
+    throw error;
+  }
+};
+
 export default api;
 

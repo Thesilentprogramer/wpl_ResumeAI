@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { uploadResume, downloadAnalysisReport } from '../api';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const analysis = data?.data;
   const [showUpload, setShowUpload] = useState(false);
   const [file, setFile] = useState(null);
@@ -71,31 +73,52 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
   };
 
   if (!analysis) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950">
+  return (
+    <div className={`min-h-screen transition-colors duration-300 relative overflow-hidden ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-[#0a0f2d] via-[#0a1338] to-[#0b1a4a]' 
+        : 'bg-gradient-to-b from-white via-gray-50 to-gray-100'
+    }`}>
+      {/* Grid overlay + spotlight */}
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? '[background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] opacity-[0.08]'
+          : '[background-image:linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] opacity-50'
+      } bg-[length:40px_40px]`}></div>
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(56,189,248,0.15),transparent_60%)]'
+          : 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(59,130,246,0.08),transparent_60%)]'
+      }`}></div>
         {/* Header */}
-        <header className="w-full px-6 sm:px-12 py-4 flex items-center justify-between border-b border-gray-800">
+        <header className={`w-full px-6 sm:px-12 py-4 flex items-center justify-between border-b bg-transparent transition-colors duration-300 ${
+          theme === 'dark' ? 'border-white/10' : 'border-gray-200'
+        }`}>
           <button 
             onClick={() => navigate('/')}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="material-symbols-outlined text-white text-xl">⚡</span>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+              <span className="text-white text-xl font-bold">R</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+            <h1 className={`text-xl sm:text-2xl font-bold transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               ResumeAI Analyzer
             </h1>
           </button>
           <div className="flex items-center gap-6">
             <button 
               onClick={() => navigate('/')}
-              className="text-gray-300 hover:text-white transition-colors"
+              className={`transition-colors duration-300 ${
+                theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
             >
               Home
             </button>
             <button
               onClick={() => setShowUpload(true)}
-              className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
+              className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-sm">description</span>
               New Analysis
@@ -106,24 +129,28 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
         {/* Empty State Content */}
         <main className="flex items-center justify-center min-h-[80vh] px-6">
           <div className="text-center max-w-2xl">
-            <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-              <span className="material-symbols-outlined text-purple-400 text-5xl">
+            <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center">
+              <span className="material-symbols-outlined text-blue-400 text-5xl">
                 description
               </span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-6">
+            <h1 className={`text-4xl sm:text-5xl font-black mb-6 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               No Analysis Yet
             </h1>
             
-            <p className="text-lg text-gray-400 mb-8 leading-relaxed">
+            <p className={`text-lg mb-8 leading-relaxed transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            }`}>
               Upload your resume to get comprehensive AI-powered insights, ATS compatibility scores, and personalized recommendations to improve your resume.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => setShowUpload(true)}
-                className="px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2"
+                className="px-8 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_10px_30px_-10px] shadow-blue-600/50 flex items-center justify-center gap-2 ring-1 ring-inset ring-white/10"
               >
                 <span className="material-symbols-outlined">upload</span>
                 Upload Resume
@@ -131,7 +158,11 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
               
               <button
                 onClick={onOpenChat}
-                className="px-8 py-4 rounded-lg border-2 border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2"
+                className={`px-8 py-4 rounded-xl border font-bold backdrop-blur-sm transition-colors flex items-center justify-center gap-2 ${
+                  theme === 'dark'
+                    ? 'border-white/10 text-white hover:border-white/20 hover:bg-white/5'
+                    : 'border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50'
+                }`}
               >
                 <span className="material-symbols-outlined">chat_bubble</span>
                 Chat with AI
@@ -140,20 +171,44 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
 
             {/* Features Preview */}
             <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20">
-                <span className="material-symbols-outlined text-purple-400 text-3xl mb-4 inline-block">🎯</span>
-                <h3 className="text-white font-bold mb-2">ATS Score</h3>
-                <p className="text-gray-400 text-sm">Get your ATS compatibility rating</p>
+              <div className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10'
+                  : 'bg-white border border-gray-200 shadow-md'
+              }`}>
+                <span className="text-blue-400 text-3xl mb-4 inline-block">🎯</span>
+                <h3 className={`font-bold mb-2 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>ATS Score</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Get your ATS compatibility rating</p>
               </div>
-              <div className="p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20">
-                <span className="material-symbols-outlined text-purple-400 text-3xl mb-4 inline-block">📈</span>
-                <h3 className="text-white font-bold mb-2">Improvements</h3>
-                <p className="text-gray-400 text-sm">Actionable recommendations</p>
+              <div className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10'
+                  : 'bg-white border border-gray-200 shadow-md'
+              }`}>
+                <span className="text-blue-400 text-3xl mb-4 inline-block">📈</span>
+                <h3 className={`font-bold mb-2 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Improvements</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>Actionable recommendations</p>
               </div>
-              <div className="p-6 rounded-xl bg-gradient-to-br from-slate-900/50 to-slate-800/30 border border-purple-500/20">
-                <span className="material-symbols-outlined text-purple-400 text-3xl mb-4 inline-block">⚡</span>
-                <h3 className="text-white font-bold mb-2">AI Insights</h3>
-                <p className="text-gray-400 text-sm">AI-powered analysis</p>
+              <div className={`p-6 rounded-xl backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10'
+                  : 'bg-white border border-gray-200 shadow-md'
+              }`}>
+                <span className="text-blue-400 text-3xl mb-4 inline-block">⚡</span>
+                <h3 className={`font-bold mb-2 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>AI Insights</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>AI-powered analysis</p>
               </div>
             </div>
           </div>
@@ -162,41 +217,61 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
         {/* Upload Modal */}
         {showUpload && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-purple-500/30 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className={`backdrop-blur-md rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                : 'bg-white border border-gray-200 shadow-2xl'
+            }`}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-white">Upload New Resume</h2>
+                <h2 className={`text-2xl font-black transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Upload New Resume</h2>
                 <button
                   onClick={() => {
                     setShowUpload(false);
                     setFile(null);
                     setError('');
                   }}
-                  className="text-gray-400 hover:text-white"
+                  className={`transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                  }`}
                 >
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center">
+                <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors duration-300 ${
+                  theme === 'dark' ? 'border-white/20' : 'border-gray-300'
+                }`}>
                   {file ? (
                     <div className="space-y-4">
                       <span className="material-symbols-outlined text-green-400 text-6xl">check_circle</span>
-                      <p className="text-white font-bold text-lg">{file.name}</p>
-                      <p className="text-gray-400 text-sm">{(file.size / 1024).toFixed(2)} KB</p>
+                      <p className={`font-bold text-lg transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{file.name}</p>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>{(file.size / 1024).toFixed(2)} KB</p>
                       <button
                         type="button"
                         onClick={() => setFile(null)}
-                        className="text-purple-400 hover:text-purple-300 text-sm"
+                        className="text-blue-400 hover:text-blue-300 text-sm"
                       >
                         Choose different file
                       </button>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <span className="material-symbols-outlined text-gray-400 text-6xl">cloud_upload</span>
-                      <p className="text-white font-bold text-lg">Drag & Drop Your Resume Here</p>
-                      <p className="text-gray-400 text-sm">or browse your files</p>
+                      <span className={`material-symbols-outlined text-6xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                      }`}>cloud_upload</span>
+                      <p className={`font-bold text-lg transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Drag & Drop Your Resume Here</p>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>or browse your files</p>
                       <input
                         type="file"
                         className="hidden"
@@ -265,30 +340,51 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-purple-900 to-blue-950">
+    <div className={`min-h-screen transition-colors duration-300 relative overflow-hidden ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-[#0a0f2d] via-[#0a1338] to-[#0b1a4a]' 
+        : 'bg-gradient-to-b from-white via-gray-50 to-gray-100'
+    }`}>
+      {/* Grid overlay + spotlight */}
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? '[background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] opacity-[0.08]'
+          : '[background-image:linear-gradient(to_right,rgba(0,0,0,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.05)_1px,transparent_1px)] opacity-50'
+      } bg-[length:40px_40px]`}></div>
+      <div className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${
+        theme === 'dark'
+          ? 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(56,189,248,0.15),transparent_60%)]'
+          : 'bg-[radial-gradient(650px_circle_at_50%_0%,rgba(59,130,246,0.08),transparent_60%)]'
+      }`}></div>
       {/* Header */}
-      <header className="w-full px-6 sm:px-12 py-4 flex items-center justify-between border-b border-gray-800">
+      <header className={`w-full px-6 sm:px-12 py-4 flex items-center justify-between border-b bg-transparent transition-colors duration-300 ${
+        theme === 'dark' ? 'border-white/10' : 'border-gray-200'
+      }`}>
         <button 
           onClick={() => navigate('/')}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-xl">⚡</span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+            <span className="text-white text-xl font-bold">R</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+          <h1 className={`text-xl sm:text-2xl font-bold transition-colors duration-300 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>
             ResumeAI Analyzer
           </h1>
         </button>
         <div className="flex items-center gap-6">
           <button 
             onClick={() => navigate('/')}
-            className="text-gray-300 hover:text-white transition-colors"
+            className={`transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+            }`}
           >
             Home
           </button>
           <button
             onClick={() => setShowUpload(true)}
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 flex items-center gap-2"
+            className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/30 flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-sm">description</span>
             New Analysis
@@ -300,10 +396,14 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
         <div className="max-w-7xl mx-auto">
           {/* Title Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
+            <h1 className={`text-4xl sm:text-5xl font-black mb-4 transition-colors duration-300 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               Resume Analysis Results
             </h1>
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+            <p className={`text-lg max-w-2xl mx-auto transition-colors duration-300 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               Comprehensive AI-powered analysis of your resume with actionable insights to improve your chances
             </p>
           </div>
@@ -312,19 +412,31 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
             {/* Left Column - Main Results */}
             <div className="lg:col-span-2 space-y-6">
               {/* ATS Score Card */}
-              <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/50 border border-purple-500/30 rounded-2xl p-8 shadow-xl">
+              <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                  : 'bg-white border border-gray-200 shadow-xl'
+              }`}>
                 <div className="flex items-start justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-black text-white mb-2">ATS Compatibility Score</h2>
-                    <p className="text-gray-400 text-sm">How well your resume performs against Applicant Tracking Systems</p>
+                    <h2 className={`text-2xl font-black mb-2 transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>ATS Compatibility Score</h2>
+                    <p className={`text-sm transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>How well your resume performs against Applicant Tracking Systems</p>
                   </div>
                   <div className="text-right">
                     <div className={`text-6xl font-black ${getScoreColor(atsScore)}`}>{atsScore}%</div>
-                    <div className="text-sm text-gray-400">{getScoreGrade(atsScore)}</div>
+                    <div className={`text-sm transition-colors duration-300 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>{getScoreGrade(atsScore)}</div>
                   </div>
                 </div>
                 
-                <div className="relative w-full h-4 bg-gray-800 rounded-full overflow-hidden">
+                <div className={`relative w-full h-4 rounded-full overflow-hidden transition-colors duration-300 ${
+                  theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'
+                }`}>
                   <div 
                     className={`h-full ${
                       atsScore >= 80 ? 'bg-gradient-to-r from-green-500 to-green-400' : 
@@ -337,21 +449,41 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
               </div>
 
               {/* Candidate Summary */}
-              <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/50 border border-purple-500/30 rounded-2xl p-8 shadow-xl">
-                <h2 className="text-2xl font-black text-white mb-4">Candidate Summary</h2>
-                <p className="text-gray-300 leading-relaxed">{summary || 'No summary available'}</p>
+              <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                  : 'bg-white border border-gray-200 shadow-xl'
+              }`}>
+                <h2 className={`text-2xl font-black mb-4 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Candidate Summary</h2>
+                <p className={`leading-relaxed transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>{summary || 'No summary available'}</p>
               </div>
 
               {/* Key Skills */}
               {skills.length > 0 && (
-                <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/50 border border-purple-500/30 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-2xl font-black text-white mb-6">Identified Skills</h2>
-                  <p className="text-gray-400 text-sm mb-4">Technologies and competencies found in your resume</p>
+                <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                    : 'bg-white border border-gray-200 shadow-xl'
+                }`}>
+                  <h2 className={`text-2xl font-black mb-6 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Identified Skills</h2>
+                  <p className={`text-sm mb-4 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Technologies and competencies found in your resume</p>
                   <div className="flex flex-wrap gap-3">
                     {skills.slice(0, 15).map((skill, idx) => (
                       <span 
                         key={idx} 
-                        className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-300 text-sm font-medium"
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          theme === 'dark'
+                            ? 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 text-purple-300'
+                            : 'bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 text-blue-700'
+                        }`}
                       >
                         {skill}
                       </span>
@@ -362,14 +494,26 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
 
               {/* Missing Keywords */}
               {missingKeywords.length > 0 && (
-                <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border border-orange-500/30 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-2xl font-black text-white mb-6">Missing Keywords</h2>
-                  <p className="text-gray-400 text-sm mb-4">Important keywords that could improve your ATS compatibility</p>
+                <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-orange-900/20 border border-orange-500/30 shadow-xl'
+                    : 'bg-orange-50 border border-orange-200 shadow-xl'
+                }`}>
+                  <h2 className={`text-2xl font-black mb-6 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Missing Keywords</h2>
+                  <p className={`text-sm mb-4 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Important keywords that could improve your ATS compatibility</p>
                   <div className="flex flex-wrap gap-3">
                     {missingKeywords.map((keyword, idx) => (
                       <span 
                         key={idx} 
-                        className="px-4 py-2 rounded-lg bg-orange-500/20 border border-orange-500/30 text-orange-300 text-sm font-medium"
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          theme === 'dark'
+                            ? 'bg-orange-500/20 border border-orange-500/30 text-orange-300'
+                            : 'bg-orange-100 border border-orange-300 text-orange-700'
+                        }`}
                       >
                         {keyword}
                       </span>
@@ -380,15 +524,31 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
 
               {/* Suggestions */}
               {suggestions.length > 0 && (
-                <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/50 border border-purple-500/30 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-2xl font-black text-white mb-6">Improvement Recommendations</h2>
+                <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                    : 'bg-white border border-gray-200 shadow-xl'
+                }`}>
+                  <h2 className={`text-2xl font-black mb-6 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>Improvement Recommendations</h2>
                   <div className="space-y-4">
                     {suggestions.map((suggestion, idx) => (
-                      <div key={idx} className="flex items-start gap-4 p-4 bg-slate-800/50 rounded-xl">
-                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0 mt-1">
-                          <span className="text-purple-400 text-sm font-bold">{idx + 1}</span>
+                      <div key={idx} className={`flex items-start gap-4 p-4 rounded-xl transition-all duration-300 ${
+                        theme === 'dark'
+                          ? 'bg-white/5 border border-white/10'
+                          : 'bg-gray-50 border border-gray-200'
+                      }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-colors duration-300 ${
+                          theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                        }`}>
+                          <span className={`text-sm font-bold transition-colors duration-300 ${
+                            theme === 'dark' ? 'text-purple-400' : 'text-purple-700'
+                          }`}>{idx + 1}</span>
                         </div>
-                        <p className="text-gray-300">{suggestion}</p>
+                        <p className={`transition-colors duration-300 ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}>{suggestion}</p>
                       </div>
                     ))}
                   </div>
@@ -397,14 +557,22 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
 
               {/* Strengths */}
               {strengths.length > 0 && (
-                <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border border-green-500/30 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-green-900/20 border border-green-500/30 shadow-xl'
+                    : 'bg-green-50 border border-green-200 shadow-xl'
+                }`}>
+                  <h2 className={`text-2xl font-black mb-6 flex items-center gap-3 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
                     <span className="material-symbols-outlined text-green-400">check_circle</span>
                     Key Strengths
                   </h2>
                   <div className="space-y-3">
                     {strengths.map((strength, idx) => (
-                      <div key={idx} className="flex items-center gap-3 text-gray-300">
+                      <div key={idx} className={`flex items-center gap-3 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
                         <span className="text-green-400">✓</span>
                         <p>{strength}</p>
                       </div>
@@ -415,14 +583,22 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
 
               {/* Weaknesses */}
               {weaknesses.length > 0 && (
-                <div className="bg-gradient-to-br from-red-900/20 to-orange-900/20 border border-red-500/30 rounded-2xl p-8 shadow-xl">
-                  <h2 className="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                <div className={`rounded-2xl p-8 backdrop-blur-sm transition-all duration-300 ${
+                  theme === 'dark'
+                    ? 'bg-red-900/20 border border-red-500/30 shadow-xl'
+                    : 'bg-red-50 border border-red-200 shadow-xl'
+                }`}>
+                  <h2 className={`text-2xl font-black mb-6 flex items-center gap-3 transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
                     <span className="material-symbols-outlined text-red-400">warning</span>
                     Areas for Improvement
                   </h2>
                   <div className="space-y-3">
                     {weaknesses.map((weakness, idx) => (
-                      <div key={idx} className="flex items-center gap-3 text-gray-300">
+                      <div key={idx} className={`flex items-center gap-3 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
                         <span className="text-red-400">⚠</span>
                         <p>{weakness}</p>
                       </div>
@@ -435,73 +611,129 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
             {/* Right Column - Sidebar */}
             <div className="lg:col-span-1 space-y-6">
               {/* What We Analyze Card */}
-              <div className="bg-gradient-to-br from-purple-900/30 to-slate-900/50 border border-purple-500/30 rounded-2xl p-6 shadow-xl">
-                <h3 className="text-xl font-black text-white mb-6">What We Analyze</h3>
+              <div className={`rounded-2xl p-6 backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                  : 'bg-white border border-gray-200 shadow-xl'
+              }`}>
+                <h3 className={`text-xl font-black mb-6 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>What We Analyze</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-purple-400 text-xl">🎯</span>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
+                      theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                    }`}>
+                      <span className={`text-xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                      }`}>🎯</span>
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1">ATS Compatibility</h4>
-                      <p className="text-gray-400 text-sm">Keyword optimization and formatting</p>
+                      <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>ATS Compatibility</h4>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Keyword optimization and formatting</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-purple-400 text-xl">📝</span>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
+                      theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                    }`}>
+                      <span className={`text-xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                      }`}>📝</span>
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1">Content Quality</h4>
-                      <p className="text-gray-400 text-sm">Impact and effectiveness</p>
+                      <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Content Quality</h4>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Impact and effectiveness</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-purple-400 text-xl">📄</span>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
+                      theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                    }`}>
+                      <span className={`text-xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                      }`}>📄</span>
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1">Format & Structure</h4>
-                      <p className="text-gray-400 text-sm">Organization and layout</p>
+                      <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Format & Structure</h4>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Organization and layout</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-purple-400 text-xl">📈</span>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${
+                      theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
+                    }`}>
+                      <span className={`text-xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                      }`}>📈</span>
                     </div>
                     <div>
-                      <h4 className="text-white font-bold mb-1">Best Practices</h4>
-                      <p className="text-gray-400 text-sm">Industry standards</p>
+                      <h4 className={`font-bold mb-1 transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Best Practices</h4>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>Industry standards</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* AI-Powered Analysis Card */}
-              <div className="bg-gradient-to-br from-blue-900/30 to-slate-900/50 border border-blue-500/30 rounded-2xl p-6 shadow-xl">
+              <div className={`rounded-2xl p-6 backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                  : 'bg-white border border-gray-200 shadow-xl'
+              }`}>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="material-symbols-outlined text-blue-400 text-3xl">⚡</span>
-                  <h3 className="text-xl font-black text-white">AI-Powered Analysis</h3>
+                  <h3 className={`text-xl font-black transition-colors duration-300 ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>AI-Powered Analysis</h3>
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className={`text-sm leading-relaxed transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                }`}>
                   Our advanced AI technology analyzes thousands of successful resumes to provide you with data-driven recommendations tailored to your industry.
                 </p>
               </div>
 
               {/* Quick Actions */}
-              <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/50 border border-purple-500/30 rounded-2xl p-6 shadow-xl">
-                <h3 className="text-xl font-black text-white mb-4">Quick Actions</h3>
+              <div className={`rounded-2xl p-6 backdrop-blur-sm transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                  : 'bg-white border border-gray-200 shadow-xl'
+              }`}>
+                <h3 className={`text-xl font-black mb-4 transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Quick Actions</h3>
                 <div className="space-y-3">
                   <button
                     onClick={onOpenChat}
-                    className="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all flex items-center justify-center gap-2 ring-1 ring-inset ring-white/10 shadow-[0_10px_30px_-10px] shadow-blue-600/40"
                   >
                     <span className="material-symbols-outlined text-sm">chat_bubble</span>
                     Chat with AI
                   </button>
                   <button
                     onClick={() => setShowUpload(true)}
-                    className="w-full px-4 py-3 rounded-lg border border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2"
+                    className={`w-full px-4 py-3 rounded-xl border font-bold transition-all flex items-center justify-center gap-2 ${
+                      theme === 'dark'
+                        ? 'border-white/10 text-white hover:bg-white/5'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     <span className="material-symbols-outlined text-sm">refresh</span>
                     Analyze New Resume
@@ -509,7 +741,11 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
                   <button 
                     onClick={handleDownloadReport}
                     disabled={downloading}
-                    className="w-full px-4 py-3 rounded-lg border border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className={`w-full px-4 py-3 rounded-xl border font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${
+                      theme === 'dark'
+                        ? 'border-white/10 text-white hover:bg-white/5'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
                   >
                     <span className="material-symbols-outlined text-sm">download</span>
                     {downloading ? 'Downloading...' : 'Download Report'}
@@ -522,11 +758,17 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
       </main>
 
       {/* Upload Modal */}
-      {showUpload && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-purple-500/30 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-black text-white">Upload New Resume</h2>
+        {showUpload && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className={`backdrop-blur-md rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto transition-all duration-300 ${
+              theme === 'dark'
+                ? 'bg-white/5 border border-white/10 shadow-[0_30px_60px_-15px] shadow-blue-600/20'
+                : 'bg-white border border-gray-200 shadow-2xl'
+            }`}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className={`text-2xl font-black transition-colors duration-300 ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>Upload New Resume</h2>
               <button
                 onClick={() => {
                   setShowUpload(false);
@@ -539,26 +781,38 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="border-2 border-dashed border-purple-500/30 rounded-xl p-8 text-center">
-                {file ? (
-                  <div className="space-y-4">
-                    <span className="material-symbols-outlined text-green-400 text-6xl">check_circle</span>
-                    <p className="text-white font-bold text-lg">{file.name}</p>
-                    <p className="text-gray-400 text-sm">{(file.size / 1024).toFixed(2)} KB</p>
-                    <button
-                      type="button"
-                      onClick={() => setFile(null)}
-                      className="text-purple-400 hover:text-purple-300 text-sm"
-                    >
-                      Choose different file
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <span className="material-symbols-outlined text-gray-400 text-6xl">cloud_upload</span>
-                    <p className="text-white font-bold text-lg">Drag & Drop Your Resume Here</p>
-                    <p className="text-gray-400 text-sm">or browse your files</p>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors duration-300 ${
+                  theme === 'dark' ? 'border-white/20' : 'border-gray-300'
+                }`}>
+                  {file ? (
+                    <div className="space-y-4">
+                      <span className="material-symbols-outlined text-green-400 text-6xl">check_circle</span>
+                      <p className={`font-bold text-lg transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{file.name}</p>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>{(file.size / 1024).toFixed(2)} KB</p>
+                      <button
+                        type="button"
+                        onClick={() => setFile(null)}
+                        className="text-blue-400 hover:text-blue-300 text-sm"
+                      >
+                        Choose different file
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <span className={`material-symbols-outlined text-6xl transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-400'
+                      }`}>cloud_upload</span>
+                      <p className={`font-bold text-lg transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>Drag & Drop Your Resume Here</p>
+                      <p className={`text-sm transition-colors duration-300 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`}>or browse your files</p>
                     <input
                       type="file"
                       className="hidden"
@@ -568,7 +822,7 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
                     />
                     <label
                       htmlFor="file-upload-modal"
-                      className="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all cursor-pointer"
+                      className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all cursor-pointer ring-1 ring-inset ring-white/10"
                     >
                       Browse Files
                     </label>
@@ -576,29 +830,37 @@ const Analysis = ({ data, onOpenChat, onAnalysisComplete }) => {
                 )}
               </div>
 
-              {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
+                {error && (
+                  <div className={`p-3 border rounded text-sm transition-colors duration-300 ${
+                    theme === 'dark'
+                      ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                      : 'bg-red-50 border-red-200 text-red-600'
+                  }`}>
+                    {error}
+                  </div>
+                )}
 
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowUpload(false);
-                    setFile(null);
-                    setError('');
-                  }}
-                  className="flex-1 px-6 py-3 rounded-lg border border-purple-500/30 text-white font-bold hover:bg-purple-500/10 transition-all"
-                >
-                  Cancel
-                </button>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowUpload(false);
+                      setFile(null);
+                      setError('');
+                    }}
+                    className={`flex-1 px-6 py-3 rounded-xl border font-bold transition-all ${
+                      theme === 'dark'
+                        ? 'border-white/10 text-white hover:bg-white/5'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Cancel
+                  </button>
                 {file && (
                   <button
                     type="submit"
                     disabled={uploading}
-                    className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold hover:from-purple-600 hover:to-blue-600 transition-all shadow-lg shadow-purple-500/30 disabled:opacity-50"
+                    className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold hover:from-blue-600 hover:to-indigo-700 transition-all shadow-[0_10px_30px_-10px] shadow-blue-600/50 disabled:opacity-50"
                   >
                     {uploading ? 'Analyzing...' : 'Analyze Resume'}
                   </button>
