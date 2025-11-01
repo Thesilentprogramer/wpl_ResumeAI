@@ -25,7 +25,7 @@ A complete MERN stack application where users can upload their resume (PDF/DOCX)
 - **Mongoose** - ODM
 - **Multer** - File upload handling
 - **pdf-parse** - PDF text extraction
-- **Google Gemini AI** - AI integration (gemini-1.5-flash)
+- **Google Gemini AI** - AI integration (gemini-2.5-flash)
 
 ## 📁 Project Structure
 
